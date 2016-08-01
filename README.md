@@ -66,3 +66,8 @@ We load the model, stored in `reinforcement_lstm_model.py`.
 
 We run the optimizer many times using the `m` model. Frequently, we evaluate the cost function for out model to make sure that it is descending. We can evaluate other variables as well such as `reward`. In a real scenario, data should be separated into training and evaluation sections. Stochastic gradient descent should also be considered by batching the testing data if data sizes are very large. 
 
+## TODO
+* Add methods for saving and recovering trained models
+* What is the purpose of `status`?
+* Not computationally efficient to check `status` each timestep and abandon if below a threshold as described in project description.
+
