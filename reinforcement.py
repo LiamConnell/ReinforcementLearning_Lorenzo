@@ -36,7 +36,7 @@ inputs = np.random.random([20,5])
 for epoch in range(200):
     sess.run(m.optimizer, feed_dict={m.environment_: inputs})
     if np.sqrt(epoch+1)%1== 0:
-        c = sess.run([ mvalid.cost], feed_dict={mvalid.environment_: inputs})
+        c = sess.run([ mvalid.status], feed_dict={mvalid.environment_: inputs})
         c = np.mean(c)
         print("Epoch:", '%04d' % (epoch+1), "cost=",c, )
 

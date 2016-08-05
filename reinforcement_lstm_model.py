@@ -35,7 +35,6 @@ class Model():
         self.sample_policy() # assign self.outputs_softmax, self.sample, self.training_target_cols
         
         self.get_status()    # assign self.status
-        self.get_reward()    # assign self.reward
 
         # compute the REINFORCEMENT of the sampled decisions
         ones = tf.ones_like(self.training_target_cols)
@@ -43,9 +42,9 @@ class Model():
         self.reinforcement = tf.transpose(tf.reshape(reinforcement_, [-1,2,num_samples]), [0,2,1]) #[?,5,2]
         
         # multiply reinforcement by reward in order to get a cost function        
-        self.cost = tf.mul(self.reinforcement , tf.expand_dims(self.reward, -1))
+        self.reward = tf.mul(self.reinforcement , tf.expand_dims(self.status, -1))
         # minimize cost function
-        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.cost)
+        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.reward)
 
         
     def LSTM_iter(self):
@@ -77,9 +76,6 @@ class Model():
                                                 self.outputs_softmax * sample_mask,1)
         self.training_target_cols = tf.concat(1, [tf.reshape(t, [-1,1]) for t in relevant_target_column.values()])
         
-    def get_status(self):
-        self.status = None
-        return
-    def get_reward(self):
-        self.reward = tf.reduce_sum(self.training_target_cols)
+    def get_status(self)
+        self.status = tf.reduce_sum(self.training_target_cols)
         return
