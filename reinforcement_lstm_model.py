@@ -76,6 +76,6 @@ class Model():
                                                 self.outputs_softmax * sample_mask,1)
         self.training_target_cols = tf.concat(1, [tf.reshape(t, [-1,1]) for t in relevant_target_column.values()])
         
-    def get_status(self)
+    def get_status(self):
         self.status = tf.reduce_sum(self.training_target_cols)
         return
