@@ -12,33 +12,14 @@ Tensorflow installation should be simple as well with anaconda. [Instructions](h
 
 ##Documentation
 
-Execution by running `python reinforcement.py`.
+Execution by running `python reinforcement.py` with any arguments tagged afterwards. See reinforcemnt.py for list of arguments with descriptions. Everything from importing data to saving/reinitializing the model to configuring the model shape and size can be configured in this manner. 
 
-###Configuration
-A configuration class contains variables that will be used to configure the model. 
+For example if we want to train a model that has data in 150 dimensions and the data is stored in MYdata.csv. We can call.
 
 ```
-    class SmallConfig(object):
-    """Small config."""
-    input_size = 5
-    output_size = 5
-    num_steps = 20
+    python reinforcement.py --data_file 'MYdata.csv' --data_size 150
+```
 
-    num_samples = 2
-    learning_rate = 0.5
-    hidden_size = 21
-    num_layers = 2
-    forget_bias = 0.1
- ```
- 
-* `input_size` is the dimension of each step of data
-* `output_size` is the dimension of what the LSTM should output. For instance, if we are chosing an integer between -3 and 3, there will be seven options, so the `output_size` is 7.
-* `num_steps` this is how many steps will come through the LSTM at a time.
-* `num_samples`: we use multi-sampling in order to aid in out stochastic descent. This is a magic number and must be chosen experimentally.
-* `learning_rate`: rate of descent, chosen experimentally. When in doubt, chose smaller learning rate.
-* `hidden_side`: the size of the LSTM state
-* `num_layers`: the depth of the LSTM
-* `forget_bias`: the rate that our LSTM forgets the past
 
 ###Loading the model
 We load the model, stored in `reinforcement_lstm_model.py`. 
@@ -56,18 +37,15 @@ We load the model, stored in `reinforcement_lstm_model.py`.
 ###Train model
 
 ```
-    for epoch in range(200):
+    for epoch in range(args.num_epochs):
         sess.run(m.optimizer, feed_dict={m.environment_: inputs})
-        if np.sqrt(epoch+1)%1== 0:
-            c = sess.run([ mvalid.cost], feed_dict={mvalid.environment_: inputs})
+        #if np.sqrt(epoch+1)%1== 0:
+        if epoch%args.save_every==0:
+            c = sess.run([ mvalid.status], feed_dict={mvalid.environment_: inputs})
             c = np.mean(c)
             print("Epoch:", '%04d' % (epoch+1), "cost=",c, )
+            checkpoint_path = os.path.join(args.save_dir, 'model.ckpt')
+            saver.save(sess, checkpoint_path, global_step =epoch)
 ```
 
 We run the optimizer many times using the `m` model. Frequently, we evaluate the cost function for out model to make sure that it is descending. We can evaluate other variables as well such as `reward`. In a real scenario, data should be separated into training and evaluation sections. Stochastic gradient descent should also be considered by batching the testing data if data sizes are very large. 
-
-## TODO
-* Add methods for saving and recovering trained models
-* What is the purpose of `status`?
-* Not computationally efficient to check `status` each timestep and abandon if below a threshold as described in project description.
-

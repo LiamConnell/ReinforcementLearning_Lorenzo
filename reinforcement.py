@@ -15,7 +15,7 @@ def parser():
     
     
     
-    parser.add_argument('--data_dir', type=str, default='data.csv',
+    parser.add_argument('--data_file', type=str, default=None,
                        help='data file path')
     parser.add_argument('--save_dir', type=str, default='save',
                        help='directory to store checkpointed models')
@@ -59,6 +59,11 @@ def parser():
     return args
     
     
+def read_data_fn(file_path):
+    '''modify this fn to correctly format data'''
+    data = pd.read_csv(file_path)
+    return data
+    
 
 def main_example():
     args = parser()
@@ -96,13 +101,17 @@ def main_example():
     if args.init_from is not None:
         saver.restore(sess, ckpt.model_checkpoint_path)
         
-    # import data (toy example)
-    inputs = np.random.random([20,5])
+    # import data 
+    if args.data_file==None: #(toy example)
+        inputs = np.random.random([args.num_steps, args.input_size])
+    else:
+        inputs = read_data_fn(args.data_file)
 
 
     for epoch in range(args.num_epochs):
         sess.run(m.optimizer, feed_dict={m.environment_: inputs})
-        if np.sqrt(epoch+1)%1== 0:
+        #if np.sqrt(epoch+1)%1== 0:
+        if epoch%args.save_every==0:
             c = sess.run([ mvalid.status], feed_dict={mvalid.environment_: inputs})
             c = np.mean(c)
             print("Epoch:", '%04d' % (epoch+1), "cost=",c, )
@@ -113,7 +122,6 @@ if __name__=="__main__":
     main_example()
     
     
-#TODO: add save every compatability from args to line 110
-        #
+
     
 #[1]: https://github.com/sherjilozair/char-rnn-tensorflow/blob/master/train.py
