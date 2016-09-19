@@ -4,7 +4,9 @@ We create a generic reinforcement learning module. We leave configuration of dat
 
 ## Installation and configuration
 
-```git clone https://github.com/LiamConnell/ReinforcementLearning_Lorenzo.git```
+```
+git clone https://github.com/LiamConnell/ReinforcementLearning_Lorenzo.git
+```
 
 I recomend the [anaconda](https://www.continuum.io/downloads) distribution of python. It includes difficult to install packages like numpy and pandas and has installation instructions for both linux and windows on the website. 
 
@@ -16,7 +18,8 @@ Once everything is installed, you can run the script through a toy example by ru
 
 To execute we will run `python reinforcement.py` in the terminal. Arguments to customize the model can be added as "tags". For example if we want to train a model that has data in 150 dimensions and the data is stored in MYdata.csv. We can call:
 
-```python reinforcement.py --data_file 'MYdata.csv' --input_size 150
+```
+python reinforcement.py --data_file 'MYdata.csv' --input_size 150
 ```
 
 Here is a list of all the arguments that we can use like this:
@@ -51,7 +54,8 @@ There are a few concepts that might help the reader if they are explained explic
 
 ### Loading the model
 We load the model, stored in `reinforcement_lstm_model.py`. 
-```sess = tf.InteractiveSession()
+```
+    sess = tf.InteractiveSession()
     # initialize variables to random values
     with tf.variable_scope("model", reuse=None):
         m = Model(config = SmallConfig)
@@ -63,7 +67,8 @@ We load the model, stored in `reinforcement_lstm_model.py`.
 
 ### Train model
 
-```for epoch in range(args.num_epochs):
+```
+    for epoch in range(args.num_epochs):
         sess.run(m.optimizer, feed_dict={m.environment_: inputs})
         #if np.sqrt(epoch+1)%1== 0:
         if epoch%args.save_every==0:
