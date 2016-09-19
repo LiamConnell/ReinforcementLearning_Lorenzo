@@ -36,13 +36,10 @@ class Model():
         
         self.get_status()    # assign self.status
 
-        # compute the REINFORCEMENT of the sampled decisions
-        ones = tf.ones_like(self.training_target_cols)
-        reinforcement_ = tf.nn.sigmoid_cross_entropy_with_logits(self.training_target_cols, ones)
-        self.reinforcement = tf.transpose(tf.reshape(reinforcement_, [-1,2,num_samples]), [0,2,1]) #[?,5,2]
-        
-        # multiply reinforcement by reward in order to get a cost function        
-        self.reward = tf.mul(self.reinforcement , tf.expand_dims(self.status, -1))
+        self.get_reinforcement()   # compute the REINFORCEMENT of the sampled decisions
+             
+        self.get_reward()    # multiply reinforcement by status in order to get a reward    
+ 
         # minimize cost function
         self.optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.reward)
 
@@ -74,8 +71,19 @@ class Model():
                                              [-1,self.output_size]), tf.float32)
             relevant_target_column[sample_iter] = tf.reduce_sum(
                                                 self.outputs_softmax * sample_mask,1)
-        self.training_target_cols = tf.concat(1, [tf.reshape(t, [-1,1]) for t in relevant_target_column.values()])
+        self.training_target_cols = tf.concat(1, [tf.reshape(t, [-1,1]) 
+                                                  for t in relevant_target_column.values()])
         
     def get_status(self):
         self.status = tf.reduce_sum(self.training_target_cols)
+        return
+    
+    def get_reinforcement(self):
+        ones = tf.ones_like(self.training_target_cols)
+        reinforcement_ = tf.nn.sigmoid_cross_entropy_with_logits(self.training_target_cols, ones)
+        self.reinforcement = tf.transpose(tf.reshape(reinforcement_, [-1,2,num_samples]), [0,2,1]) 
+        return
+    
+    def get_reward(self):
+        self.reward = tf.mul(self.reinforcement , tf.expand_dims(self.status, -1))
         return

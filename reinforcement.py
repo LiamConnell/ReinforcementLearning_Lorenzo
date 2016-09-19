@@ -61,7 +61,7 @@ def parser():
     
 def read_data_fn(file_path):
     '''modify this fn to correctly format data'''
-    data = pd.read_csv(file_path)
+    data = pd.read_csv(file_path, header=None)
     return data
     
 
@@ -84,6 +84,8 @@ def main_example():
         for checkme in need_be_same:
             assert vars(saved_model_args)[checkme]==vars(args)[checkme],"Command line argument and saved model disagree on '%s' "%checkme
     # save config args
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
     with open(os.path.join(args.save_dir, 'config.pkl'), 'wb') as f:
         cPickle.dump(args, f)
     
@@ -106,7 +108,8 @@ def main_example():
         inputs = np.random.random([args.num_steps, args.input_size])
     else:
         inputs = read_data_fn(args.data_file)
-
+        if inputs.shape != (args.num_steps, args.input_size):
+            raise ValueError('arguements (args.num_steps, args.input_size) must match dimension of data')
 
     for epoch in range(args.num_epochs):
         sess.run(m.optimizer, feed_dict={m.environment_: inputs})
@@ -117,6 +120,7 @@ def main_example():
             print("Epoch:", '%04d' % (epoch+1), "cost=",c, )
             checkpoint_path = os.path.join(args.save_dir, 'model.ckpt')
             saver.save(sess, checkpoint_path, global_step =epoch)
+    saver.save(sess, checkpoint_path, global_step =epoch)
 
 if __name__=="__main__":
     main_example()
